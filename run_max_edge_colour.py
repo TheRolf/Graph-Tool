@@ -1,4 +1,5 @@
-from graphplotter import GraphPlotterMaxEdgeClr
+from graphplotter import GraphPlotter
+from instance_max_edge_colour import MaxEdgeColourInstance
 
 """
 USAGE:
@@ -6,18 +7,28 @@ Left click:     placing new vertex/edge OR choosing existing vertex/edge
 Right click:    (when a vertex being selected) moving the vertex to a new position
 Delete:         deleting selected vertex/edge
 Backspace:      clear worksheet
-'x':            running the LP and showing an optimal colouring (requires Gurobi license)
-'y':            running the LP and showing an optimal colouring with a unique colour for each pendant edge 
-'z':            running the LP and showing an optimal colouring with a unique colour for each fixed-colour edge 
-'m':            running the LP and showing an optimal colouring subject to all pendant edges having the same colour
-'n':            running the LP and showing an optimal colouring subject to all pendant edges having the same unique colour
-'c':            set colour of edge
 'i':            enter edges of a new graph
 'j':            enter edges of a new graph (graph6 format)
 'd':            [console] debug information
 'l':            [console] prints whether the graph is planar (lowercase L)
 'p':            generates a planar layout
+
+'c':            set colour of edge
+
+'x':            running the LP and showing an optimal colouring (requires Gurobi license)
+'y':            running the LP and showing an optimal colouring with a unique colour for each pendant edge 
+'z':            running the LP and showing an optimal colouring with a unique colour for each fixed-colour edge 
+'m':            running the LP and showing an optimal colouring subject to all pendant edges having the same colour
+'n':            running the LP and showing an optimal colouring subject to all pendant edges having the same unique colour
+
 """
+
+
+class GraphPlotterMaxEdgeClr(GraphPlotter):
+    def __init__(self, points=None, edges=None):
+        super().__init__(points=points, edges=edges)
+        self.instance = MaxEdgeColourInstance(self.coordinates.keys(), edges)
+        
 
 if __name__ == '__main__':
     # Small test example

@@ -210,9 +210,3 @@ class GraphPlotter:
                        for i in self.coordinates}
         print(f"vertices = {coordinates}")
         print(f"edges = {self.instance.edges}")
-
-
-class GraphPlotterMaxEdgeClr(GraphPlotter):
-    def __init__(self, points=None, edges=None):
-        super().__init__(points=points, edges=edges)
-        self.instance = MaxEdgeColourInstance(self.coordinates.keys(), edges)

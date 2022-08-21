@@ -6,12 +6,15 @@ Left click:     placing new vertex/edge OR choosing existing vertex/edge
 Right click:    (when a vertex being selected) moving the vertex to a new position
 Delete:         deleting selected vertex/edge
 Backspace:      clear worksheet
-'c':            set input parameter of edge
 'i':            enter edges of a new graph
 'j':            enter edges of a new graph (graph6 format)
 'd':            [console] debug information
 'l':            [console] prints whether the graph is planar (lowercase L)
 'p':            generates a planar layout
+
+'c':            (placeholder) set input parameter of edge
+
+'x', 'y', 'z', 'm', 'n':    (placeholder) input for solve()
 """
 
 if __name__ == '__main__':

@@ -1,13 +1,12 @@
 from ast import literal_eval
 from itertools import combinations
-from pprint import pprint
 
 import networkx as nx
 
 from tools import Env, graph6_to_edges
 
 
-def isNormalizedQ(G, clawFreeQ=False):
+def isNormalizedQ(G):
     # degree-2 vertices
     for v in G.nodes:
         if G.degree[v] == 2:
@@ -73,37 +72,12 @@ def isNormalizedQ(G, clawFreeQ=False):
         if len(simple_cacti) > 0:
             return False
 
-    # (3-)claw-freeness
-
-
     # isolated points (legacy)
     isolates = list(nx.isolates(G))
     if len(isolates):
         return False
 
     return True
-
-
-def isNormalizedQ_text(G):
-    for v in G.nodes:
-        if G.degree[v] == 2:
-            return f"No, for example deg({v})=2."
-
-    leaves = {v: [u for u in G[v] if G.degree[u]==1] for v in G.nodes}
-    leaves = list({v: leaves[v] for v in leaves if len(leaves[v]) >= 2}.keys())
-    if len(leaves) > 0:
-        return f"No, for example vertex {leaves[0]} has more than one pendant edge."
-
-    for u, v, w in combinations(G.nodes, 3):
-        if (u, v) in G.edges and (v, w) in G.edges and (w, u) in G.edges:
-            if (G.degree[u], G.degree[v], G.degree[w]) == (3, 3, 3):
-                return f"No, for example the triplet {(u, v, w)} is a simple cactus."
-
-    isolates = list(nx.isolates(G))
-    if len(isolates):
-        return f"No, for example {isolates[0]} is an isolated vertex."
-
-    return "Yes! (did NOT check simple cacti larger than size 1)"
 
 
 def sparse_triangles(G):
