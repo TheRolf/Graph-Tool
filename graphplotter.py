@@ -11,13 +11,13 @@ from instance import Instance
 
 
 class GraphPlotter:
-    def __init__(self, points=None, edges=None):
+    def __init__(self, points=None, edges=None, faces=None):
         self.EPS = 0.15
         self.eps = 0.1
         self.X, self.Y = 8, 5
 
         self.coordinates = points or {}
-        self.instance = Instance(self.coordinates.keys(), edges)
+        self.instance = Instance(self.coordinates.keys(), edges, faces)
 
         self.i_sel, self.e_sel = None, None
         self.fig, self.ax = None, None
@@ -154,7 +154,8 @@ class GraphPlotter:
                 self.ax.plot((x1, x2), (y1, y2), color=self.instance.color_of_edge(i, j), zorder=2, linewidth=4)
                 self.ax.plot((x1, x2), (y1, y2), color='w', zorder=2, linewidth=1.5)
             else:
-                self.ax.plot((x1, x2), (y1, y2), color=self.instance.color_of_edge(i, j), zorder=2, linewidth=3)
+                self.ax.plot((x1, x2), (y1, y2), color=self.instance.color_of_edge(i, j), zorder=2,
+                             linewidth=self.instance.width_of_edge(i, j))
 
             e_text = self.instance.color_of_edge(i, j, textQ=True)
             if e_text != '':

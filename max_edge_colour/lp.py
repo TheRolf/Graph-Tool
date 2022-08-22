@@ -22,49 +22,7 @@ def pendant_edges(V, E):
     return pendant_dict
 
 
-def lp_simple(E, env=None):
-    if len(E) == 1:
-        return 1, {list(E)[0]: 1}
-    if env is None:
-        env = gurobipy.Env(empty=True)
-        env.setParam('LogToConsole', 0)
-        env.start()
-    V = set([v for e in E for v in e])
-    C = range(1, len(V)+1)
-
-    model = gurobipy.Model("max_edge_colour", env=env)
-
-    y = model.addVars([edge(e) for e in E], C, vtype=GRB.BINARY, lb=0, ub=1, name="y")
-    z = model.addVars(C, vtype=GRB.BINARY, lb=0, ub=1, name="z")
-    model.setObjective(sum((z[c]) for c in C), GRB.MAXIMIZE)
-
-    # colour 'c' is used (z[c]) if there is an edge coloured 'c' (y[e, c])
-    model.addConstrs((z[c] <= sum(y[u, v, c] for u, v in E)) for c in C)
-    # every edge has one color
-    model.addConstrs((sum(y[u, v, c] for c in C) == 1) for u, v in E)
-    # use the first opt colors from the color list
-    model.addConstrs(z[c] >= z[c + 1] for c in C[:-1])
-
-    x = model.addVars(V, C, vtype=GRB.BINARY, lb=0, ub=1, name="x")
-    model.addConstrs((y[u, v, c] <= x[w, c]) for c in C for u, v in E for w in [u, v])
-    model.addConstrs((sum(x[v, c] for c in C) <= 2) for v in V)
-
-    model.optimize()
-
-    res = {}
-    for u, v in E:
-        for c in C:
-            if round(float(y[u, v, c].X), 5) > 0:
-                res[u, v] = c
-    obj_val = round(model.getObjective().getValue(), 5)
-    return obj_val, res
-
-
 def lp(E, q=2, k=0, env=None, relaxQ=False, leavesUniqueQ=False, leavesNonUniqueQ=False, leavesMonoQ=False, blockLeaveColourQ=False, fixedUniqueQ=False):
-    """
-    If E is a list/tuple/set, it works without pre-set colours.
-    If E is a dict, it sets the not key k as E[k], if E[k] is not 'None'
-    """
     if len(E)==1:
         return 1, {list(E)[0]: 1}
     if env is None:
@@ -131,7 +89,7 @@ def lp(E, q=2, k=0, env=None, relaxQ=False, leavesUniqueQ=False, leavesNonUnique
 
     model.optimize()
     res, obj_val = {}, -float("inf")
-    if model.status == 2:
+    if model.status == GRB.OPTIMAL:
         for u, v in E:
             for c in C:
                 if round(float(y[u, v, c].X), 5) > 0:
@@ -140,6 +98,3 @@ def lp(E, q=2, k=0, env=None, relaxQ=False, leavesUniqueQ=False, leavesNonUnique
                     res[u, v] = c
         obj_val = round(model.getObjective().getValue(), 5)
     return obj_val, res
-
-
-

@@ -8,12 +8,8 @@ from max_edge_colour.preprocess import isNormalizedQ
 
 
 class MaxEdgeColourInstance(Instance):
-    env = gurobipy.Env(empty=True)
-    env.setParam('LogToConsole', 0)
-    env.start()
-
-    def __init__(self, vertices=None, edges=None):
-        super().__init__(vertices, edges)
+    def __init__(self, vertices=None, edges=None, faces=None):
+        super().__init__(vertices, edges, faces)
         self.colour_calc = {}
 
     def color_of_edge(self, u, v, textQ=False):
@@ -64,6 +60,9 @@ class MaxEdgeColourInstance(Instance):
         M = nx.max_weight_matching(G, maxcardinality=True)
         self.message += f"G is normalized: {isNormalizedQ(G)}\n"
         self.message += f"|V|={len(self.vertices)}, Max. matching is size {len(M)}\n({M})"
+
+    def width_of_edge(self, u, v):
+        return 3
 
     def print_debug_info(self):
         print(f"x_vec = {self.x_vec}")

@@ -25,9 +25,9 @@ Backspace:      clear worksheet
 
 
 class GraphPlotterMaxEdgeClr(GraphPlotter):
-    def __init__(self, points=None, edges=None):
-        super().__init__(points=points, edges=edges)
-        self.instance = MaxEdgeColourInstance(self.coordinates.keys(), edges)
+    def __init__(self, points=None, edges=None, faces=None):
+        super().__init__(points=points, edges=edges, faces=faces)
+        self.instance = MaxEdgeColourInstance(self.coordinates.keys(), edges, faces)
 
 
 if __name__ == '__main__':

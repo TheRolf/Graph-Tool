@@ -12,6 +12,10 @@ class Instance:
         self.vertices = set(vertices or [])
         self.edges = set(edges or [])
         self.faces = faces or [(), ]
+        if faces is not None and edges is None:
+            for face in faces:
+                for e in pairs(face):
+                    self.edges.add(edge(e))
 
         self.f_obj = 0
         self.x_vec = {}
@@ -40,6 +44,9 @@ class Instance:
 
     def color_of_edge(self, u, v, textQ=False):
         return '' if textQ else 'k'
+
+    def width_of_edge(self, u, v):
+        return 1
 
     def update(self):
         self.f_obj = 0
