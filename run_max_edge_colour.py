@@ -28,7 +28,7 @@ class GraphPlotterMaxEdgeClr(GraphPlotter):
     def __init__(self, points=None, edges=None):
         super().__init__(points=points, edges=edges)
         self.instance = MaxEdgeColourInstance(self.coordinates.keys(), edges)
-        
+
 
 if __name__ == '__main__':
     # Small test example

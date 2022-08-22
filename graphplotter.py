@@ -22,6 +22,12 @@ class GraphPlotter:
         self.i_sel, self.e_sel = None, None
         self.fig, self.ax = None, None
 
+        self.showfacesQ = False
+        self.faceQ = False
+        self.unboundedQ = False
+        self.current_face = []
+        self.message = ""
+
     def mouse_click(self, event):
         if event.inaxes is None:
             return
@@ -53,6 +59,9 @@ class GraphPlotter:
         elif event.key == 'backspace':
             self.reset()
 
+        elif event.key == 'escape':
+            self.cancel()
+
         elif event.key == 'c' and self.e_sel is not None:
             text_gui = easygui.enterbox("", f"Set colour for edge {self.e_sel}")
             c = None if text_gui in ['', '0', None] else int(text_gui)
@@ -65,6 +74,13 @@ class GraphPlotter:
 
         elif event.key in ['l', 'p']:  # lowercase L and P
             self.planarity(repositionQ=(event.key=='p'))
+
+        elif event.key in ['f', 'g']:
+            self.unboundedQ = (event.key == 'g')
+            self.start_face()
+
+        elif event.key == 'h':
+            self.showfacesQ = not self.showfacesQ
 
         elif event.key in ['x', 'y', 'z', 'm', 'n']:
             self.instance.solve(option=event.key)
@@ -93,6 +109,12 @@ class GraphPlotter:
         self.coordinates = points or {}
         self.instance = Instance(self.coordinates.keys(), edges)
 
+    def cancel(self):
+        self.i_sel, self.e_sel = None, None
+        self.current_face = []
+        self.faceQ = False
+        self.message = ""
+
     def start(self):
         self.fig, self.ax = plt.subplots(figsize=(12, 9))
         self.fig.canvas.mpl_disconnect(self.fig.canvas.manager.key_press_handler_id)
@@ -109,6 +131,8 @@ class GraphPlotter:
         self.draw_vertices()
         self.draw_edges()
         self.draw_text()
+        if self.showfacesQ:
+            self.draw_faces()
         plt.draw()
 
     def draw_vertices(self):
@@ -138,23 +162,42 @@ class GraphPlotter:
                 self.ax.add_patch(plt.Circle((tx, ty), 0.075, color='w', zorder=3))
                 self.ax.annotate(f"{e_text}", (tx, ty), zorder=3, ha='center', va='center')
 
+    def draw_faces(self):
+        for j, face in enumerate(self.instance.faces):
+            if j > 0:
+                x0, y0, k = 0, 0, 0
+                for i in face:
+                    x0 += self.coordinates[i][0]
+                    y0 += self.coordinates[i][1]
+                    k += 1
+                x0 = x0/k
+                y0 = y0/k
+                self.ax.annotate(str(j), (x0, y0), c="gray")
+
     def draw_text(self):
         self.ax.annotate(self.instance.message, (0.4, 0.25))
+        self.ax.annotate(self.message, (0.4, 0.25))
 
     def select(self, x, y):
         self.e_sel = self.select_line(x, y)
         # If we clicked on an edge, select it
         if self.e_sel is None:
             i, x, y = self.select_vertex(x, y)
+            if self.faceQ:
+                self.add_vertex_to_face(i)
+
             # If we clicked on the selected vertex, de-select it
             if self.i_sel == i:
                 self.i_sel = None
+
             elif self.i_sel is not None:
                 self.instance.add_edge(self.i_sel, i)
-                print(f"add: {(self.i_sel, i)}")
-                self.i_sel = None
+                if self.faceQ:
+                    self.i_sel = i
+                else:
+                    self.i_sel = None
 
-            else:
+            else:  # self.i_sel not in [i, None]
                 self.i_sel = i
 
     def select_vertex(self, x, y):
@@ -167,7 +210,6 @@ class GraphPlotter:
                 i += 1
             self.coordinates[i] = [x, y]
             self.instance.add_vertex(i)
-            print(f"add: {i}")
             self.draw()
             return i, x, y
 
@@ -191,6 +233,27 @@ class GraphPlotter:
         self.instance.delete_edge(e)
         print(f"del: {e}")
 
+    def start_face(self):
+        self.message = f"Specify {'the unbounded' if self.unboundedQ else 'a'} face:"
+        self.faceQ = True
+
+    def add_vertex_to_face(self, i):
+        if i in self.current_face[1:]:
+            return
+
+        if len(self.current_face) > 0 and i == self.current_face[0]:
+            if self.unboundedQ:
+                self.instance.faces[0] = tuple(self.current_face)
+            else:
+                self.instance.faces.append(tuple(self.current_face))
+            self.showfacesQ = True
+            self.current_face = []
+            self.faceQ = False
+            self.message = ""
+        else:
+            self.current_face.append(i)
+            self.message += f" {i}"
+
     def planarity(self, repositionQ=False):
         G = nx.Graph(self.instance.edges)
         planarity = nx.check_planarity(G, counterexample=True)
@@ -210,3 +273,4 @@ class GraphPlotter:
                        for i in self.coordinates}
         print(f"vertices = {coordinates}")
         print(f"edges = {self.instance.edges}")
+        print(f"faces = {self.instance.faces}")

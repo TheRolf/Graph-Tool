@@ -18,6 +18,13 @@ def edge(e):
     return tuple(e) if e[0] < e[1] else tuple(reversed(e))
 
 
+def pairs(circle):
+    return (edge(e) for e in zip(circle, circle[1:]+circle[0:1]))
+
+
+def triplets(circle):
+    return zip(circle, circle[1:]+circle[0:1], circle[2:]+circle[0:2])
+
 def graph6_to_edges(string):
     """
     From networkx 2.8.2, modified slightly

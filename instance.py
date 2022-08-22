@@ -1,6 +1,6 @@
 import gurobipy
 
-from tools import edge
+from tools import edge, pairs
 
 
 class Instance:
@@ -8,9 +8,10 @@ class Instance:
     env.setParam('LogToConsole', 0)
     env.start()
 
-    def __init__(self, vertices=None, edges=None):
+    def __init__(self, vertices=None, edges=None, faces=None):
         self.vertices = set(vertices or [])
         self.edges = set(edges or [])
+        self.faces = faces or [(), ]
 
         self.f_obj = 0
         self.x_vec = {}
@@ -50,12 +51,14 @@ class Instance:
         self.vertices.remove(v)
         del self.input_parameter_vertices[v]
         self.edges = set(e for e in self.edges if v not in e)
+        self.faces = [face for face in self.faces if v not in face]
         self.update()
 
     def delete_edge(self, e):
         e = edge(e)
         self.edges.remove(e)
         del self.input_parameter_edges[e]
+        self.faces = [face for face in self.faces if e not in pairs(face)]
         self.update()
 
     def solve(self, option='x'):
