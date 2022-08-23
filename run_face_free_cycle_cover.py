@@ -14,7 +14,8 @@ Backspace:      clear worksheet
 'l':            [console] prints whether the graph is planar (lowercase L)
 'p':            generates a planar layout
 
-'c':            -
+'c':            fixing selected edge in solution
+'v'             fixing specified face in solution
 
 'x':            calculating a random face-free 2-factor (optionally using fixed edges)
 'y':            calculating a random face-free and inclusion-free 2-factor (optionally using fixed edges)
@@ -28,10 +29,6 @@ class GraphPlotterFaceFree(GraphPlotter):
     def __init__(self, points=None, edges=None, faces=None):
         super().__init__(points=points, edges=edges, faces=faces)
         self.instance = FaceFreeCycleCoverInstance(self.coordinates.keys(), edges, faces)
-
-    def draw_text(self):
-        self.ax.annotate(self.instance.message, (0.4, 0.1))
-        self.ax.annotate(self.message, (0.4, 0.1))
 
 
 if __name__ == '__main__':

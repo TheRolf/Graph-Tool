@@ -35,7 +35,7 @@ def lp(faces, env=None, relaxQ=False, randomQ=False, faceFreeQ=True, fixEdges=()
         model.addConstrs((sum(x[edge(e)] for e in pairs(face)) <= len(face)-1) for face in faces)
 
     # fixed edges
-    model.addConstrs(x[edge(e)] == 1 for e in fixEdges if fixEdges[e] is not None)
+    model.addConstrs(x[edge(e)] == 1 for e in fixEdges if fixEdges[e])
 
     model.optimize()
     res = {}

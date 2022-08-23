@@ -26,7 +26,6 @@ class GraphPlotter:
         self.faceQ = False
         self.unboundedQ = False
         self.current_face = []
-        self.message = ""
 
     def mouse_click(self, event):
         if event.inaxes is None:
@@ -61,12 +60,16 @@ class GraphPlotter:
 
         elif event.key == 'escape':
             self.cancel()
+            self.instance.update()
 
         elif event.key == 'c' and self.e_sel is not None:
-            text_gui = easygui.enterbox("", f"Set colour for edge {self.e_sel}")
-            c = None if text_gui in ['', '0', None] else int(text_gui)
-            self.instance.set_input_parameter_edge(self.e_sel, c)
+            self.instance.set_input_parameter_edge_dialog(self.e_sel)
             self.e_sel = None
+            self.instance.update()
+
+        elif event.key == 'v':
+            self.instance.set_other_parameter_dialog()
+            self.instance.update()
 
         elif event.key == 'd':
             self.print_debug_info()
@@ -113,7 +116,6 @@ class GraphPlotter:
         self.i_sel, self.e_sel = None, None
         self.current_face = []
         self.faceQ = False
-        self.message = ""
 
     def start(self):
         self.fig, self.ax = plt.subplots(figsize=(12, 9))
@@ -126,6 +128,7 @@ class GraphPlotter:
     def draw(self):
         self.ax.cla()
         self.ax.set_aspect(1)
+        self.fig.suptitle(self.instance.title)
         plt.xlim([0, self.X])
         plt.ylim([0, self.Y])
         self.draw_vertices()
@@ -177,7 +180,6 @@ class GraphPlotter:
 
     def draw_text(self):
         self.ax.annotate(self.instance.message, (0.4, 0.25))
-        self.ax.annotate(self.message, (0.4, 0.25))
 
     def select(self, x, y):
         self.e_sel = self.select_line(x, y)

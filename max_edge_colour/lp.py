@@ -44,7 +44,7 @@ def lp(E, q=2, k=0, env=None, relaxQ=False, leavesUniqueQ=False, leavesNonUnique
     model.setObjective(sum((z[c]) for c in C), GRB.MAXIMIZE)
 
     for u, v in E.keys():
-        if E[u, v] is not None:
+        if E[u, v]:
             u, v = edge((u, v))
             m = E[u, v]
             model.addConstr(y[u, v, m] == 1, f"colour of {(u, v)} is {m}")

@@ -1,4 +1,5 @@
 import gurobipy
+import easygui
 
 from tools import edge, pairs
 
@@ -21,8 +22,9 @@ class Instance:
         self.x_vec = {}
         self.solvedQ = False
         self.message = ""
+        self.title = ""
 
-        self.input_parameter_edges = {e: None for e in self.edges}
+        self.input_parameter_edges = {e: False for e in self.edges}
         self.input_parameter_vertices = {v: None for v in self.vertices}
 
     def add_vertex(self, v):
@@ -36,11 +38,16 @@ class Instance:
             self.vertices.add(u)
             self.vertices.add(v)
             self.edges.add(e)
-            self.input_parameter_edges[e] = None
+            self.input_parameter_edges[e] = False
             self.update()
 
-    def set_input_parameter_edge(self, e, c):
+    def set_input_parameter_edge_dialog(self, e):
+        text_gui = easygui.enterbox("", f"Set input for edge {e}")
+        c = None if text_gui in ['', '0', None] else int(text_gui)
         self.input_parameter_edges[e] = c
+
+    def set_other_parameter_dialog(self):
+        pass
 
     def color_of_edge(self, u, v, textQ=False):
         return '' if textQ else 'k'
@@ -52,7 +59,7 @@ class Instance:
         self.f_obj = 0
         self.x_vec = {}
         self.solvedQ = False
-        self.message = ""
+        self.title = ""
 
     def delete_vertex(self, v):
         self.vertices.remove(v)

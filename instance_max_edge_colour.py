@@ -1,4 +1,4 @@
-import gurobipy
+import easygui
 import networkx as nx
 import seaborn as sns
 
@@ -14,16 +14,18 @@ class MaxEdgeColourInstance(Instance):
 
     def color_of_edge(self, u, v, textQ=False):
         if self.solvedQ:
-            return (f"{self.input_parameter_edges[u, v]}*" if self.input_parameter_edges[u, v] is not None else str(self.x_vec[u, v])) if textQ else self.colour_calc[self.x_vec[u, v]-1]
+            return (f"{self.input_parameter_edges[u, v]}*" if self.input_parameter_edges[u, v] else str(self.x_vec[u, v])) if textQ else self.colour_calc[self.x_vec[u, v]-1]
         else:
-            return (f"{self.input_parameter_edges[u, v]}*" if self.input_parameter_edges[u, v] is not None else '') if textQ else 'k'
+            return (f"{self.input_parameter_edges[u, v]}*" if self.input_parameter_edges[u, v] else '') if textQ else 'k'
 
     def update(self):
         super().update()
         self.colour_calc = {}
 
-    def set_input_parameter_edge(self, e, c):
-        labels = [z for z in self.input_parameter_edges.values() if z is not None]
+    def set_input_parameter_edge_dialog(self, e):
+        text_gui = easygui.enterbox("", f"Set colour for edge {e}")
+        c = None if text_gui in ['', '0', None] else int(text_gui)
+        labels = [label for f, label in self.input_parameter_edges.items() if f != e and label]
         max_label = 0 if labels == [] else max(labels)
         if c <= max_label:
             self.input_parameter_edges[e] = c
